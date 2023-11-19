@@ -21,15 +21,15 @@ model User {
 }
 
 model Projects {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String
-  start_date  DateTime
-  deadline    DateTime
-  createdAt   DateTime @default(now())
+  start_date  DateTime?
+  deadline    DateTime?
+  createdAt   DateTime  @default(now())
   createdBy   Int
-  status_id   Int
-  assignedTo  Int
+  status_id   Int       @default(1)
+  assignedTo  Int?
 }
 
 model Project_status {

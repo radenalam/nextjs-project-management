@@ -17,16 +17,25 @@ import React, { useEffect, useState } from "react";
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+
   useEffect(() => {
-    // Fetch issues data when the component mounts
+    // Fetch projects data when the component mounts
     axios
       .get("/api/projects")
-      .then((response) => setProjects(response.data))
-      .catch((error) => console.error("Error fetching issues:", error));
+      .then((response) => {
+        // Check if the response data is an array before setting the state
+        if (Array.isArray(response.data)) {
+          setProjects(response.data);
+        } else {
+          console.error("Invalid response data format:", response.data);
+        }
+      })
+      .catch((error) => console.error("Error fetching projects:", error));
   }, []);
+
   return (
     <main className="mx-60 border">
-      <button
+      {/* <button
         className="btn"
         onClick={() => document.getElementById("add_project").showModal()}
       >
@@ -42,12 +51,11 @@ const ProjectsPage = () => {
           />
           <div className="modal-action">
             <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
               <button className="btn">Close</button>
             </form>
           </div>
         </div>
-      </dialog>
+      </dialog> */}
 
       {/* TABEL */}
       <div className="overflow-x-auto ">
@@ -65,7 +73,7 @@ const ProjectsPage = () => {
             </tr>
           </thead>
           <tbody>
-            {/* {projects.map((project, i) => (
+            {projects?.map((project, i) => (
               <tr key={project.id}>
                 <th>{project.id}</th>
                 <td>{project.title}</td>
@@ -75,7 +83,7 @@ const ProjectsPage = () => {
                 <td>{project.status_id}</td>
                 <td></td>
               </tr>
-            ))} */}
+            ))}
           </tbody>
         </table>
       </div>
