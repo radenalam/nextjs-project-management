@@ -14,7 +14,9 @@ export async function POST(req: NextRequest) {
     data: validation.data,
   });
 
-  return NextResponse.json("Berhasil di tambah", { status: 201 });
+  return NextResponse.json(newProject["title"] + " Berhasil di tambah", {
+    status: 201,
+  });
 }
 
 export async function GET(req: NextRequest) {

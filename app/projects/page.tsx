@@ -14,29 +14,59 @@ import {
   TextArea,
   TextField,
   Select,
-  SelectLabel,
-  SelectGroup,
 } from "@radix-ui/themes";
 import { useForm } from "react-hook-form";
-import { title } from "process";
-import { describe } from "node:test";
+import Link from "next/link";
 
 interface Project {
   id: number;
   title: string;
   description: string;
-  start_date: Date;
-  deadline: Date;
+  start_date: string | null;
+  deadline: string | null;
   created_at: Date;
   created_by: number;
   status_id: number;
-  assigned_to: number;
+  assigned_to: number | null;
   client_id: number;
 }
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const { register, handleSubmit } = useForm<Project>();
+  const { register, handleSubmit } = useForm<Project>({});
+  const [selectedValue, setSelectedValue] = useState<string>("");
+  const onSubmit = (data: Project) => {
+    data.status_id = 1; // Default status_id to 1
+    data.created_by = 1; // Default created_by to 1
+    if (selectedValue === "internal") {
+      data.client_id = 0;
+    } else if (selectedValue === "client") {
+      data.client_id = Number(data.client_id);
+    }
+
+    if (!data.start_date) {
+      data.start_date = null; // Assign current date if start_date is not provided
+    }
+    if (!data.deadline) {
+      data.deadline = null; // Assign current date if deadline is not provided
+    }
+    if (!data.assigned_to) {
+      data.assigned_to = null; // Assign null if assigned_to is not provided
+    } else {
+      data.assigned_to = Number(data.assigned_to);
+    }
+
+    console.log("Form data submitted:", data);
+    axios
+      .post("/api/projects", data)
+      .then((response) => {
+        console.log("Response:", response);
+        if (response.status === 201) {
+          setProjects([...projects, response.data]);
+        }
+      })
+      .catch((error) => console.error("Error creating project:", error));
+  };
 
   useEffect(() => {
     axios
@@ -72,13 +102,23 @@ const ProjectsPage = () => {
             placeholder="Description"
             {...register("description")}
           />
-          <Select.Root defaultValue="client">
-            <Select.Trigger mb="2" max-w-full />
+          <Select.Root
+            defaultValue="client"
+            onValueChange={(value: string) => setSelectedValue(value)}
+          >
+            <Select.Trigger mb="2" />
             <Select.Content>
               <Select.Item value="internal">Internal</Select.Item>
               <Select.Item value="client">Client</Select.Item>
             </Select.Content>
           </Select.Root>
+          {selectedValue === "client" && (
+            <TextField.Input
+              mb="2"
+              placeholder="Client ID"
+              {...register("client_id", { required: "Client ID is required" })}
+            />
+          )}
           <TextField.Input
             mb="2"
             placeholder="Start Date"
@@ -95,7 +135,9 @@ const ProjectsPage = () => {
             {...register("assigned_to")}
           />
           <DialogClose>
-            <Button className="float-right">Save</Button>
+            <Button onClick={handleSubmit(onSubmit)} className="float-right">
+              Save
+            </Button>
           </DialogClose>
           <DialogClose>
             <Button className="float-right">Close</Button>
@@ -119,8 +161,12 @@ const ProjectsPage = () => {
         <Table.Body>
           {projects.map((project, i) => (
             <Table.Row key={i}>
-              <Table.RowHeaderCell>{project.id}</Table.RowHeaderCell>
-              <Table.Cell>{project.title}</Table.Cell>
+              <Table.RowHeaderCell>
+                <Link href={`/projects/${project.id}`}>{project.id}</Link>
+              </Table.RowHeaderCell>
+              <Table.Cell>
+                <Link href={`/projects/${project.id}`}>{project.title}</Link>
+              </Table.Cell>
               <Table.Cell>{project.description}</Table.Cell>
               <Table.Cell></Table.Cell>
               <Table.Cell></Table.Cell>
