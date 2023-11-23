@@ -15,9 +15,12 @@ model User {
   first_name String
   last_name  String
   email      String @unique
+  user_type  String
+  is_admin   Int
   password   String
   img        String
   role_id    Int
+  client_id  Int
 }
 
 model Projects {
@@ -26,10 +29,10 @@ model Projects {
   description String
   start_date  DateTime?
   deadline    DateTime?
-  createdAt   DateTime  @default(now())
-  createdBy   Int
+  created_at  DateTime  @default(now())
+  created_by  Int
   status_id   Int       @default(1)
-  assignedTo  Int?
+  assigned_to Int?
 }
 
 model Project_status {
