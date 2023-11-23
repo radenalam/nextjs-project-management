@@ -33,6 +33,7 @@ model Projects {
   created_by  Int
   status_id   Int       @default(1)
   assigned_to Int?
+  client_id   Int       @default(0)
 }
 
 model Project_status {

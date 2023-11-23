@@ -13,7 +13,13 @@ import {
   Table,
   TextArea,
   TextField,
+  Select,
+  SelectLabel,
+  SelectGroup,
 } from "@radix-ui/themes";
+import { useForm } from "react-hook-form";
+import { title } from "process";
+import { describe } from "node:test";
 
 interface Project {
   id: number;
@@ -21,23 +27,21 @@ interface Project {
   description: string;
   start_date: Date;
   deadline: Date;
-  createdAt: Date;
-  createdBy: number;
+  created_at: Date;
+  created_by: number;
   status_id: number;
-  assignedTo: number;
+  assigned_to: number;
+  client_id: number;
 }
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [newProjectTitle, setNewProjectTitle] = useState("");
+  const { register, handleSubmit } = useForm<Project>();
 
   useEffect(() => {
-    // Fetch projects data when the component mounts
     axios
       .get("/api/projects")
       .then((response) => {
-        // Check if the response data is an array before setting the state
         if (Array.isArray(response.data)) {
           setProjects(response.data);
         } else {
@@ -46,16 +50,6 @@ const ProjectsPage = () => {
       })
       .catch((error) => console.error("Error fetching projects:", error));
   }, []);
-
-  const handleAddProject = () => {
-    console.log("Opening modal. Current isModalOpen:", isModalOpen); // Log sebelum setModalOpen
-
-    // Handle logic for adding a new project
-    // ...
-
-    // Close the modal
-    setModalOpen(false);
-  };
 
   return (
     <Container>
@@ -68,15 +62,43 @@ const ProjectsPage = () => {
 
         <DialogContent style={{ maxWidth: 500 }}>
           <DialogTitle>Add Project</DialogTitle>
-          <TextField.Input id="title" mb="2" placeholder="Title" />
-          <TextArea id="description" mb="2" placeholder="Description" />
-          <TextField.Input id="start_date" mb="2" placeholder="Start Date" />
-          <TextField.Input id="deadline" mb="2" placeholder="Deadline" />
-          <TextField.Input id="assign_to" mb="3" placeholder="Assgin To" />
+          <TextField.Input
+            mb="2"
+            placeholder="Title"
+            {...register("title", { required: "Title is required" })}
+          />
+          <TextArea
+            mb="2"
+            placeholder="Description"
+            {...register("description")}
+          />
+          <Select.Root defaultValue="client">
+            <Select.Trigger mb="2" max-w-full />
+            <Select.Content>
+              <Select.Item value="internal">Internal</Select.Item>
+              <Select.Item value="client">Client</Select.Item>
+            </Select.Content>
+          </Select.Root>
+          <TextField.Input
+            mb="2"
+            placeholder="Start Date"
+            {...register("start_date")}
+          />
+          <TextField.Input
+            mb="2"
+            placeholder="Deadline"
+            {...register("deadline")}
+          />
+          <TextField.Input
+            mb="3"
+            placeholder="Assign To"
+            {...register("assigned_to")}
+          />
           <DialogClose>
-            <Button onClick={handleAddProject} className="float-right">
-              Save
-            </Button>
+            <Button className="float-right">Save</Button>
+          </DialogClose>
+          <DialogClose>
+            <Button className="float-right">Close</Button>
           </DialogClose>
         </DialogContent>
       </DialogRoot>
