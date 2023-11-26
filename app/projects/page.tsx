@@ -17,6 +17,8 @@ import {
 } from "@radix-ui/themes";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface Project {
   id: number;
@@ -33,8 +35,8 @@ interface Project {
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const { register, handleSubmit } = useForm<Project>({});
-  const [selectedValue, setSelectedValue] = useState<string>("");
+  const { register, handleSubmit, setValue } = useForm<Project>({});
+  const [selectedValue, setSelectedValue] = useState<string>("client");
   const onSubmit = (data: Project) => {
     data.status_id = 1; // Default status_id to 1
     data.created_by = 1; // Default created_by to 1
@@ -102,23 +104,29 @@ const ProjectsPage = () => {
             placeholder="Description"
             {...register("description")}
           />
-          <Select.Root
-            defaultValue="client"
-            onValueChange={(value: string) => setSelectedValue(value)}
-          >
-            <Select.Trigger mb="2" />
-            <Select.Content>
-              <Select.Item value="internal">Internal</Select.Item>
-              <Select.Item value="client">Client</Select.Item>
-            </Select.Content>
-          </Select.Root>
-          {selectedValue === "client" && (
-            <TextField.Input
-              mb="2"
-              placeholder="Client ID"
-              {...register("client_id", { required: "Client ID is required" })}
-            />
-          )}
+          <div className="flex flex-row max-w-fit">
+            <Select.Root
+              defaultValue="client"
+              onValueChange={(value: string) => setSelectedValue(value)}
+            >
+              <Select.Trigger mb="2" />
+              <Select.Content>
+                <Select.Item value="internal">Internal</Select.Item>
+                <Select.Item value="client">Client</Select.Item>
+              </Select.Content>
+            </Select.Root>
+            {selectedValue === "client" && (
+              <TextField.Input
+                mb="2"
+                ml="2"
+                placeholder="Client ID"
+                {...register("client_id", {
+                  required: "Client ID is required",
+                })}
+              />
+            )}
+          </div>
+
           <TextField.Input
             mb="2"
             placeholder="Start Date"
@@ -133,6 +141,11 @@ const ProjectsPage = () => {
             mb="3"
             placeholder="Assign To"
             {...register("assigned_to")}
+          />
+          <TextField.Input
+            mb="3"
+            placeholder="Status"
+            {...register("status_id")}
           />
           <DialogClose>
             <Button onClick={handleSubmit(onSubmit)} className="float-right">

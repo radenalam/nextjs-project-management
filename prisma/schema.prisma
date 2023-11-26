@@ -43,14 +43,14 @@ model Project_status {
 }
 
 model Tasks {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String
   project_id  Int
   assignedTo  Int
-  start_date  DateTime
-  deadline    DateTime
-  CreatedAt   DateTime
+  start_date  DateTime?
+  deadline    DateTime?
+  CreatedAt   DateTime  @default(now())
   CreatedBy   Int
   status      String
   status_id   Int

@@ -8,5 +8,5 @@ export const createProjectSchema = z.object({
   client_id: z.number(),
   created_by: z.number(),
   status_id: z.number(),
-  assigned_to: z.number(),
+  assigned_to: z.number().nullable(),
 });
